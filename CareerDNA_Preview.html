@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>职场人格图鉴 · CareerDNA</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+/* ===== RESET & BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{height:100%;font-size:16px;}
+body{
+  height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Noto Sans SC','Helvetica Neue',sans-serif;
+  background:#0a0a1a;
+  color:#1a1a2e;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+#app{
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  position:relative;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:0 0 80px rgba(102,126,234,0.3);
+}
+
+/* ===== PAGE SYSTEM ===== */
+.page{display:none;min-height:100vh;position:relative;}
+.page.active{display:flex;flex-direction:column;}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floatUp{0%{transform:translateY(0)}50%{transform:translateY(-12px)}100%{transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes bounceIn{0%{transform:scale(0.3);opacity:0}50%{transform:scale(1.08)}70%{transform:scale(0.95)}100%{transform:scale(1);opacity:1}}
+@keyframes barFill{from{width:0}to{width:var(--target-width)}}
+@keyframes particleFloat{
+  0%{transform:translateY(110vh) scale(0);opacity:0}
+  5%{opacity:.6}
+  90%{opacity:.4}
+  100%{transform:translateY(-10vh) scale(1.5);opacity:0}
+}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px rgba(102,126,234,.4)}50%{box-shadow:0 0 40px rgba(102,126,234,.8),0 0 60px rgba(118,75,162,.4)}}
+@keyframes typeCursor{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ===== LANDING PAGE ===== */
+#page-landing{
+  background:linear-gradient(135deg,#0f0c29 0%,#302b63 45%,#1a1040 100%);
+  color:#fff;
+  align-items:center;
+  justify-content:center;
+  padding:0 24px 40px;
+  overflow:hidden;
+}
+.particles-canvas{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.particle{
+  position:absolute;
+  border-radius:50%;
+  animation:particleFloat linear infinite;
+}
+.landing-content{position:relative;z-index:1;width:100%;text-align:center;animation:fadeSlideIn .8s ease;}
+.logo-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:50px;padding:6px 16px;margin-bottom:32px;
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.8);
+}
+.logo-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 1.5s infinite;}
+.landing-hero-emoji{
+  font-size:80px;margin-bottom:16px;display:block;
+  animation:floatUp 3s ease-in-out infinite;
+}
+.landing-title{
+  font-size:32px;font-weight:800;line-height:1.2;
+  margin-bottom:12px;
+  background:linear-gradient(135deg,#fff 0%,#c4b5fd 50%,#93c5fd 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.landing-sub{font-size:15px;color:rgba(255,255,255,.65);line-height:1.7;margin-bottom:32px;}
+.stat-row{
+  display:flex;justify-content:center;gap:32px;margin-bottom:36px;
+}
+.stat-item{text-align:center;}
+.stat-num{font-size:22px;font-weight:700;color:#c4b5fd;}
+.stat-label{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
+.btn-primary{
+  display:block;width:100%;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;border:none;border-radius:16px;
+  padding:18px 24px;font-size:17px;font-weight:700;
+  cursor:pointer;letter-spacing:.5px;
+  animation:glowPulse 2s infinite;
+  transition:transform .15s;
+}
+.btn-primary:active{transform:scale(0.97);}
+.btn-skip{
+  display:block;width:100%;background:none;border:none;
+  color:rgba(255,255,255,.35);font-size:13px;margin-top:16px;
+  cursor:pointer;padding:8px;
+}
+.features{
+  display:flex;justify-content:center;gap:20px;margin-bottom:32px;
+}
+.feature-tag{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  border-radius:50px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,.7);
+}
+
+/* ===== USER INFO PAGE ===== */
+#page-info{
+  background:linear-gradient(180deg,#f8f7ff 0%,#fff 100%);
+  padding:60px 24px 40px;
+}
+.info-header{margin-bottom:32px;}
+.info-title{font-size:24px;font-weight:800;color:#1a1a2e;margin-bottom:8px;}
+.info-sub{font-size:14px;color:#6b7280;line-height:1.6;}
+.form-group{margin-bottom:28px;}
+.form-label{font-size:13px;font-weight:600;color:#374151;margin-bottom:12px;display:block;text-transform:uppercase;letter-spacing:.5px;}
+.option-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{
+  border:2px solid #e5e7eb;border-radius:50px;
+  padding:8px 18px;font-size:14px;color:#374151;
+  cursor:pointer;transition:all .2s;background:#fff;
+}
+.chip.selected{border-color:#667eea;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:600;}
+.btn-start{
+  display:block;width:100%;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;border:none;border-radius:14px;
+  padding:16px;font-size:16px;font-weight:700;
+  cursor:pointer;margin-top:32px;
+  transition:transform .15s,opacity .15s;
+}
+.btn-start:active{transform:scale(0.98);}
+.progress-dots{
+  display:flex;gap:6px;margin-bottom:32px;
+}
+.dot-step{width:24px;height:4px;border-radius:2px;background:#e5e7eb;}
+.dot-step.active{background:linear-gradient(90deg,#667eea,#764ba2);}
+
+/* ===== QUESTION PAGE ===== */
+#page-quiz{
+  background:#f9fafb;
+  padding:0;
+}
+.quiz-header{
+  background:#fff;padding:16px 24px 0;
+  border-bottom:1px solid #f3f4f6;
+}
+.quiz-progress-bar-wrap{
+  height:4px;background:#e5e7eb;border-radius:2px;margin-bottom:12px;overflow:hidden;
+}
+.quiz-progress-bar{
+  height:100%;border-radius:2px;
+  background:linear-gradient(90deg,#667eea,#a78bfa,#f59e0b);
+  transition:width .4s ease;
+}
+.quiz-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-bottom:12px;
+}
+.quiz-counter{font-size:13px;font-weight:600;color:#667eea;}
+.quiz-dim-badge{
+  font-size:11px;color:#9ca3af;background:#f3f4f6;
+  border-radius:50px;padding:3px 10px;
+}
+.question-area{
+  flex:1;padding:24px 20px;display:flex;flex-direction:column;
+}
+.question-text{
+  font-size:19px;font-weight:700;color:#1a1a2e;line-height:1.5;
+  margin-bottom:28px;animation:fadeSlideIn .3s ease;
+}
+.options-scenario{display:flex;flex-direction:column;gap:14px;}
+.option-card{
+  background:#fff;border:2px solid #e5e7eb;border-radius:16px;
+  padding:18px 16px;cursor:pointer;
+  display:flex;align-items:flex-start;gap:14px;
+  transition:all .2s;animation:fadeSlideIn .3s ease;
+  position:relative;overflow:hidden;
+}
+.option-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  opacity:0;transition:opacity .2s;
+}
+.option-card:hover{border-color:#a78bfa;transform:translateY(-2px);box-shadow:0 8px 24px rgba(102,126,234,.15);}
+.option-card.selected{border-color:#667eea;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;}
+.option-card.selected .option-text{color:#fff;}
+.option-label{
+  width:28px;height:28px;border-radius:50%;
+  background:#f3f4f6;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#374151;flex-shrink:0;margin-top:1px;
+  transition:all .2s;
+}
+.option-card.selected .option-label{background:rgba(255,255,255,.25);color:#fff;}
+.option-text{font-size:15px;color:#374151;line-height:1.55;flex:1;transition:color .2s;}
+
+.scale-question{animation:fadeSlideIn .3s ease;}
+.scale-desc{display:flex;justify-content:space-between;font-size:12px;color:#9ca3af;margin-bottom:16px;}
+.scale-buttons{display:flex;gap:10px;justify-content:center;}
+.scale-btn{
+  width:52px;height:52px;border-radius:50%;border:2px solid #e5e7eb;
+  background:#fff;font-size:16px;font-weight:700;color:#374151;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.scale-btn:hover{border-color:#a78bfa;color:#667eea;transform:scale(1.1);}
+.scale-labels{display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;margin-top:10px;}
+
+/* ===== LOADING PAGE ===== */
+#page-loading{
+  background:linear-gradient(135deg,#0f0c29 0%,#302b63 60%,#1a1040 100%);
+  align-items:center;justify-content:center;color:#fff;
+}
+.loading-content{text-align:center;}
+.loading-spinner{
+  width:80px;height:80px;border:3px solid rgba(255,255,255,.1);
+  border-top:3px solid #a78bfa;border-radius:50%;
+  animation:spin 1s linear infinite;margin:0 auto 24px;
+}
+.loading-emoji{font-size:48px;margin-bottom:16px;animation:floatUp 2s ease-in-out infinite;}
+.loading-title{font-size:20px;font-weight:700;margin-bottom:8px;}
+.loading-dots{display:flex;justify-content:center;gap:8px;margin-top:16px;}
+.loading-dot{width:8px;height:8px;border-radius:50%;background:#a78bfa;animation:pulse 1.2s infinite;}
+.loading-dot:nth-child(2){animation-delay:.2s;}
+.loading-dot:nth-child(3){animation-delay:.4s;}
+.loading-steps{margin-top:32px;text-align:left;display:inline-block;}
+.loading-step{
+  font-size:13px;color:rgba(255,255,255,.5);padding:6px 0;
+  display:flex;align-items:center;gap:10px;
+}
+.loading-step.done{color:rgba(255,255,255,.85);}
+.step-check{width:16px;height:16px;border-radius:50%;background:#10b981;
+  display:inline-flex;align-items:center;justify-content:center;font-size:10px;}
+.step-spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);
+  border-top:2px solid #a78bfa;border-radius:50%;animation:spin .8s linear infinite;display:inline-block;}
+
+/* ===== RESULTS PAGE ===== */
+#page-result{
+  background:#f4f3ff;
+  padding-bottom:40px;
+}
+.result-hero{
+  padding:40px 24px 48px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.result-hero-bg{
+  position:absolute;inset:0;
+  z-index:0;
+}
+.result-hero-content{position:relative;z-index:1;}
+.result-character{
+  width:110px;height:110px;border-radius:50%;
+  margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:54px;
+  background:rgba(255,255,255,.2);
+  border:3px solid rgba(255,255,255,.4);
+  box-shadow:0 8px 32px rgba(0,0,0,.2);
+  animation:bounceIn .6s ease .3s both;
+}
+.result-type-label{
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(255,255,255,.7);margin-bottom:6px;
+}
+.result-type-name{
+  font-size:30px;font-weight:800;color:#fff;margin-bottom:4px;
+  text-shadow:0 2px 12px rgba(0,0,0,.2);
+}
+.result-type-code{
+  display:inline-block;background:rgba(255,255,255,.2);
+  color:rgba(255,255,255,.9);border-radius:50px;padding:4px 14px;
+  font-size:13px;font-weight:600;margin-bottom:14px;letter-spacing:2px;
+}
+.result-tagline{
+  font-size:15px;color:rgba(255,255,255,.85);line-height:1.5;
+  max-width:280px;margin:0 auto;
+}
+.result-wave{
+  position:absolute;bottom:-1px;left:0;right:0;
+  height:40px;background:#f4f3ff;
+  clip-path:ellipse(55% 100% at 50% 100%);
+}
+
+/* SCORES CARD */
+.result-card{
+  background:#fff;border-radius:20px;margin:16px;
+  padding:24px;box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+.result-card-title{
+  font-size:13px;font-weight:700;color:#374151;
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title-icon{
+  width:24px;height:24px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.dim-row{margin-bottom:18px;}
+.dim-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.dim-name{font-size:14px;font-weight:600;color:#1a1a2e;}
+.dim-score{font-size:13px;font-weight:700;color:#667eea;}
+.dim-bar-bg{height:10px;background:#f3f4f6;border-radius:5px;overflow:hidden;}
+.dim-bar{
+  height:100%;border-radius:5px;
+  transition:width 1.2s cubic-bezier(0.4,0,0.2,1);
+  width:0;
+}
+.dim-poles{display:flex;justify-content:space-between;margin-top:5px;}
+.dim-pole{font-size:11px;color:#9ca3af;}
+.dim-pole.active{font-weight:600;}
+
+/* RADAR CHART */
+#radar-chart{width:100%;height:240px;}
+
+/* AI COMMENT SECTION */
+.ai-section{
+  background:#fff;border-radius:20px;margin:16px;
+  overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+.ai-header{
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  padding:16px 24px;
+  display:flex;align-items:center;gap:12px;
+}
+.ai-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.ai-header-text{flex:1;}
+.ai-name{font-size:14px;font-weight:700;color:#fff;}
+.ai-status{font-size:12px;color:rgba(255,255,255,.7);}
+.ai-body{padding:20px 24px;}
+.ai-comment-text{
+  font-size:15px;color:#374151;line-height:1.9;white-space:pre-wrap;
+}
+.ai-cursor{
+  display:inline-block;width:2px;height:16px;
+  background:#667eea;margin-left:2px;vertical-align:middle;
+  animation:typeCursor .8s infinite;
+}
+.ai-section-tag{
+  display:inline-block;background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;
+  font-weight:700;margin-bottom:6px;margin-top:14px;
+}
+
+/* JOB CARDS */
+.jobs-grid{display:flex;flex-direction:column;gap:12px;}
+.job-card{
+  border-radius:16px;padding:16px 18px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;transition:transform .2s;
+}
+.job-card:active{transform:scale(0.98);}
+.job-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.job-info{flex:1;}
+.job-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;}
+.job-reason{font-size:13px;color:rgba(255,255,255,.8);line-height:1.4;}
+.job-match{
+  font-size:13px;font-weight:700;color:#fff;
+  background:rgba(255,255,255,.2);border-radius:50px;
+  padding:4px 10px;white-space:nowrap;
+}
+
+/* SHARE SECTION */
+.share-section{margin:16px;text-align:center;}
+.share-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;border:none;border-radius:14px;
+  padding:16px;font-size:16px;font-weight:700;cursor:pointer;
+  transition:transform .15s;margin-bottom:12px;
+}
+.share-btn:active{transform:scale(0.98);}
+.retake-btn{
+  background:none;border:2px solid #e5e7eb;color:#6b7280;
+  border-radius:12px;padding:12px;font-size:14px;
+  cursor:pointer;width:100%;transition:all .2s;
+}
+.retake-btn:hover{border-color:#667eea;color:#667eea;}
+.share-tip{font-size:12px;color:#9ca3af;margin-top:8px;}
+
+/* PERSONALITY COLORS */
+.color-commander{background:linear-gradient(135deg,#1e3c72,#2a5298);}
+.color-architect{background:linear-gradient(135deg,#134e5e,#71b280);}
+.color-lightning{background:linear-gradient(135deg,#e52d27,#b31217);}
+.color-executor{background:linear-gradient(135deg,#16a085,#27ae60);}
+.color-innovator{background:linear-gradient(135deg,#834d9b,#d04ed6);}
+.color-researcher{background:linear-gradient(135deg,#0f3460,#533483);}
+.color-pioneer{background:linear-gradient(135deg,#f7971e,#ffd200);}
+.color-inventor{background:linear-gradient(135deg,#f953c6,#b91d73);}
+.color-coach{background:linear-gradient(135deg,#1d976c,#93f9b9);}
+.color-coordinator{background:linear-gradient(135deg,#4e54c8,#8f94fb);}
+.color-catalyst{background:linear-gradient(135deg,#f46b45,#eea849);}
+.color-guardian{background:linear-gradient(135deg,#f64f59,#c471ed);}
+.color-speaker{background:linear-gradient(135deg,#f7971e,#ffd200);}
+.color-connector{background:linear-gradient(135deg,#4e54c8,#8f94fb);}
+.color-performer{background:linear-gradient(135deg,#ff6b6b,#feca57);}
+.color-supporter{background:linear-gradient(135deg,#a18cd1,#fbc2eb);}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:2px;}
+
+/* Responsive desktop */
+@media(min-width:430px){
+  body{background:#0f0c29;}
+  #app{box-shadow:0 0 100px rgba(102,126,234,.4);}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== LANDING ===== -->
+  <div id="page-landing" class="page active">
+    <div class="particles-canvas" id="particles"></div>
+    <div class="landing-content">
+      <div class="logo-badge"><span class="logo-dot"></span>CareerDNA · 职场人格图鉴</div>
+      <span class="landing-hero-emoji">🧬</span>
+      <h1 class="landing-title">找到只属于你的<br>职场天赋密码</h1>
+      <p class="landing-sub">48道情境题 · 10分钟 · 发现你与别人<br>真正不同的地方，找到最适合你的方向</p>
+      <div class="features">
+        <span class="feature-tag">🎯 16种职场人格</span>
+        <span class="feature-tag">🤖 AI深度点评</span>
+        <span class="feature-tag">📊 科学测评</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat-item"><div class="stat-num">48</div><div class="stat-label">道测评题</div></div>
+        <div class="stat-item"><div class="stat-num">16</div><div class="stat-label">种人格类型</div></div>
+        <div class="stat-item"><div class="stat-num">10min</div><div class="stat-label">完成时间</div></div>
+      </div>
+      <button class="btn-primary" onclick="goPage('info')">🚀 开始发现我的职场天赋</button>
+      <button class="btn-skip" onclick="showDemoResult()">⚡ 跳过测评，直接看示例结果 →</button>
+    </div>
+  </div>
+
+  <!-- ===== USER INFO ===== -->
+  <div id="page-info" class="page">
+    <div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:40px 24px 32px;color:#fff;">
+      <div style="font-size:13px;opacity:.7;margin-bottom:8px;letter-spacing:1px;">STEP 1/2 · 基本信息</div>
+      <h2 style="font-size:24px;font-weight:800;line-height:1.3">告诉我们一点<br>关于你的情况</h2>
+    </div>
+    <div style="padding:28px 24px;flex:1;background:#f9fafb;">
+      <div class="form-group">
+        <label class="form-label">📌 你目前的状态</label>
+        <div class="option-chips" id="status-chips">
+          <div class="chip" onclick="selectChip('status','student',this)">🎓 在校大学生</div>
+          <div class="chip" onclick="selectChip('status','fresh',this)">🌱 应届/即将毕业</div>
+          <div class="chip" onclick="selectChip('status','working',this)">💼 有工作经验</div>
+          <div class="chip" onclick="selectChip('status','change',this)">🔄 正在考虑转行</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🎯 感兴趣的方向（可多选）</label>
+        <div class="option-chips" id="industry-chips">
+          <div class="chip" onclick="selectChip('industry','tech',this)">💻 互联网/科技</div>
+          <div class="chip" onclick="selectChip('industry','biz',this)">📈 商业/管理</div>
+          <div class="chip" onclick="selectChip('industry','creative',this)">🎨 创意/内容</div>
+          <div class="chip" onclick="selectChip('industry','finance',this)">💰 金融/数据</div>
+          <div class="chip" onclick="selectChip('industry','people',this)">🤝 教育/咨询/HR</div>
+          <div class="chip" onclick="selectChip('industry','other',this)">🌐 其他/未确定</div>
+        </div>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">下一步 → 开始测评</button>
+      <p style="text-align:center;font-size:12px;color:#9ca3af;margin-top:16px;">以上信息仅用于个性化点评，完全匿名</p>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="page-quiz" class="page">
+    <div class="quiz-header">
+      <div class="quiz-progress-bar-wrap">
+        <div class="quiz-progress-bar" id="quiz-progress-bar" style="width:0%"></div>
+      </div>
+      <div class="quiz-meta">
+        <span class="quiz-counter" id="quiz-counter">第 1 / 48 题</span>
+        <span class="quiz-dim-badge" id="quiz-dim-badge">驱动力</span>
+      </div>
+    </div>
+    <div class="question-area" id="question-area">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div id="page-loading" class="page">
+    <div class="loading-content">
+      <div class="loading-emoji" id="loading-emoji">🧬</div>
+      <h2 class="loading-title">正在分析你的职场DNA</h2>
+      <p style="font-size:14px;color:rgba(255,255,255,.55);margin-top:6px;">请稍候，AI正在为你生成专属报告</p>
+      <div class="loading-dots">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </div>
+      <div class="loading-steps" id="loading-steps">
+        <div class="loading-step" id="step1"><span class="step-spin"></span> 计算四维度得分</div>
+        <div class="loading-step" id="step2"><span class="step-spin"></span> 匹配职场人格类型</div>
+        <div class="loading-step" id="step3"><span class="step-spin"></span> AI生成个性化点评</div>
+        <div class="loading-step" id="step4"><span class="step-spin"></span> 匹配最适合你的岗位</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RESULTS ===== -->
+  <div id="page-result" class="page" style="overflow-y:auto;">
+    <div class="result-hero" id="result-hero">
+      <div class="result-hero-bg" id="result-hero-bg"></div>
+      <div class="result-hero-content">
+        <div class="result-type-label">你的职场人格类型</div>
+        <div class="result-character" id="result-emoji">🎯</div>
+        <div class="result-type-name" id="result-name">战略指挥官</div>
+        <div class="result-type-code" id="result-code">ADSE</div>
+        <p class="result-tagline" id="result-tagline">你用数据制定战略，用系统推动世界</p>
+      </div>
+      <div class="result-wave"></div>
+    </div>
+
+    <!-- DIMENSION SCORES -->
+    <div class="result-card">
+      <div class="result-card-title">
+        <div class="card-title-icon" style="background:#ede9fe;">📊</div>
+        四维度能力图谱
+      </div>
+      <div id="dim-scores-container">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- RADAR CHART -->
+    <div class="result-card">
+      <div class="result-card-title">
+        <div class="card-title-icon" style="background:#e0f2fe;">🕸️</div>
+        职场能力雷达图
+      </div>
+      <div id="radar-chart"></div>
+    </div>
+
+    <!-- AI COMMENT -->
+    <div class="ai-section">
+      <div class="ai-header">
+        <div class="ai-avatar">🤖</div>
+        <div class="ai-header-text">
+          <div class="ai-name">AI职业顾问 · DeepSeek</div>
+          <div class="ai-status" id="ai-status">▶ 正在为你生成专属点评...</div>
+        </div>
+      </div>
+      <div class="ai-body">
+        <div class="ai-comment-text" id="ai-comment">
+          <span id="ai-text-content"></span><span class="ai-cursor" id="ai-cursor"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOB RECOMMENDATIONS -->
+    <div class="result-card">
+      <div class="result-card-title">
+        <div class="card-title-icon" style="background:#fef3c7;">🎯</div>
+        最适合你的职业方向
+      </div>
+      <div class="jobs-grid" id="jobs-container">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- SHARE -->
+    <div class="share-section">
+      <button class="share-btn" onclick="alert('分享功能在正式版中可生成专属图片卡并分享到微信！')">
+        📤 分享我的职场人格
+      </button>
+      <button class="retake-btn" onclick="restartQuiz()">🔄 重新测评</button>
+      <p class="share-tip">已有 <strong>12,847</strong> 人完成测评</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// =============================================
+//  DATA: ALL 48 QUESTIONS
+// =============================================
+const DIM_NAMES = {
+  D1:'驱动力',D2:'思维方式',D3:'执行风格',D4:'影响方式'
+};
+
+const questions = [
+  // ── D1 驱动力 (Achievement A ←→ Relationship R) ──
+  {id:'D1-S01',dim:'D1',type:'scenario',
+   text:'年终绩效评优，你更在意的是：',
+   optA:{text:'自己负责的项目是否超出了预期指标',pole:'A'},
+   optB:{text:'团队成员是否都得到了公平的认可',pole:'B'}},
+  {id:'D1-S02',dim:'D1',type:'scenario',
+   text:'接受一份新工作，你最看重的是：',
+   optA:{text:'这个职位能帮你实现职业目标和成长',pole:'A'},
+   optB:{text:'公司文化和团队氛围让你感到舒适',pole:'B'}},
+  {id:'D1-S03',dim:'D1',type:'scenario',
+   text:'工作中，你最有成就感的时刻是：',
+   optA:{text:'凭一己之力攻克了别人都解决不了的难题',pole:'A'},
+   optB:{text:'帮助一个挣扎中的同事顺利完成了任务',pole:'B'}},
+  {id:'D1-S04',dim:'D1',type:'scenario',
+   text:'领导对你提出批评，你的第一反应是：',
+   optA:{text:'分析批评是否有道理，思考如何改进表现',pole:'A'},
+   optB:{text:'先关注和领导的关系是否受影响',pole:'B'}},
+  {id:'D1-S05',dim:'D1',type:'scenario',
+   text:'面对艰难任务，你更容易因为什么坚持：',
+   optA:{text:'完成后带来的成就感和外界认可',pole:'A'},
+   optB:{text:'不想让信任和依赖你的人失望',pole:'B'}},
+  {id:'D1-S06',dim:'D1',type:'scenario',
+   text:'一个月内，你更有可能主动做：',
+   optA:{text:'学习一项新技能，提升自己的专业竞争力',pole:'A'},
+   optB:{text:'主动约同事朋友，维系良好的人际关系',pole:'B'}},
+  {id:'D1-S07',dim:'D1',type:'scenario',
+   text:'你更希望别人怎么描述你：',
+   optA:{text:'"这个人做事特别有目标感，成果非常亮眼"',pole:'A'},
+   optB:{text:'"这个人非常靠谱，和他合作特别舒服"',pole:'B'}},
+  {id:'D1-S08',dim:'D1',type:'scenario',
+   text:'和同事意见不一致时，你通常会：',
+   optA:{text:'据理力争，因为最优方案比维持和谐更重要',pole:'A'},
+   optB:{text:'先充分理解对方立场，再一起寻求共识',pole:'B'}},
+  {id:'D1-L09',dim:'D1',type:'scale',
+   text:'完成一个有挑战性的目标后，我会感到比平时明显更有活力',
+   poleHigh:'A'},
+  {id:'D1-L10',dim:'D1',type:'scale',
+   text:'在一个项目里，比起做出成绩，我更在乎团队的和谐氛围',
+   poleHigh:'B'},
+  {id:'D1-L11',dim:'D1',type:'scale',
+   text:'即使没有人知道，我也会为了把事情做到最好而额外付出',
+   poleHigh:'A'},
+  {id:'D1-L12',dim:'D1',type:'scale',
+   text:'帮助别人解决难题时，获得的满足感不亚于自己取得成就',
+   poleHigh:'B'},
+
+  // ── D2 思维方式 (Data D ←→ Intuitive I) ──
+  {id:'D2-S01',dim:'D2',type:'scenario',
+   text:'面对复杂问题，你的第一步通常是：',
+   optA:{text:'收集数据，系统梳理各种可能性和证据',pole:'A'},
+   optB:{text:'先凭直觉判断大方向，再找证据验证',pole:'B'}},
+  {id:'D2-S02',dim:'D2',type:'scenario',
+   text:'做重要决策时，你更倾向于：',
+   optA:{text:'花时间整理所有信息，做出有依据的判断',pole:'A'},
+   optB:{text:'相信自己的经验和直觉，快速做出判断',pole:'B'}},
+  {id:'D2-S03',dim:'D2',type:'scenario',
+   text:'你更享受哪类工作内容：',
+   optA:{text:'用数据和分析解决有明确答案的问题',pole:'A'},
+   optB:{text:'在模糊情境中提出全新的思路和方案',pole:'B'}},
+  {id:'D2-S04',dim:'D2',type:'scenario',
+   text:'开会讨论方案时，你更可能说的是：',
+   optA:{text:'"我们来看一下数据，数字显示……"',pole:'A'},
+   optB:{text:'"我有个想法，可能有点跳跃，但先听我说……"',pole:'B'}},
+  {id:'D2-S05',dim:'D2',type:'scenario',
+   text:'以下两种人，你更羡慕哪一种：',
+   optA:{text:'把复杂问题层层拆解、逻辑无懈可击的人',pole:'A'},
+   optB:{text:'总能提出让人眼前一亮的创新方案的人',pole:'B'}},
+  {id:'D2-S06',dim:'D2',type:'scenario',
+   text:'做一份提案时，你更注重：',
+   optA:{text:'数据准确、逻辑严密，有完整的论证链',pole:'A'},
+   optB:{text:'框架新颖、视角独特，能引发不同思考',pole:'B'}},
+  {id:'D2-S07',dim:'D2',type:'scenario',
+   text:'以下两项工作，哪个更能发挥你的优势：',
+   optA:{text:'评估一个商业计划的可行性和潜在风险',pole:'A'},
+   optB:{text:'从零构思一个新产品的概念和定位',pole:'B'}},
+  {id:'D2-S08',dim:'D2',type:'scenario',
+   text:'别人批评你的思考方式，你更常听到哪个：',
+   optA:{text:'"你想得太细了，有时候分析过多耽误事"',pole:'A'},
+   optB:{text:'"你想法太跳跃，有时候不够踏实落地"',pole:'B'}},
+  {id:'D2-L09',dim:'D2',type:'scale',
+   text:'做决定前，我习惯尽可能多地收集数据和事实依据',
+   poleHigh:'A'},
+  {id:'D2-L10',dim:'D2',type:'scale',
+   text:'我经常能从别人没注意到的角度发现问题的解法',
+   poleHigh:'B'},
+  {id:'D2-L11',dim:'D2',type:'scale',
+   text:'面对数字和数据，我比大多数同龄人更有分析兴趣',
+   poleHigh:'A'},
+  {id:'D2-L12',dim:'D2',type:'scale',
+   text:'我更享受创造全新事物，而不是把现有东西优化得更好',
+   poleHigh:'B'},
+
+  // ── D3 执行风格 (Systematic S ←→ Flexible F) ──
+  {id:'D3-S01',dim:'D3',type:'scenario',
+   text:'接到一个新项目，你的第一反应是：',
+   optA:{text:'把项目拆解为阶段和子任务，做好计划再启动',pole:'A'},
+   optB:{text:'先快速启动，在推进过程中边做边调整',pole:'B'}},
+  {id:'D3-S02',dim:'D3',type:'scenario',
+   text:'你更能接受哪种长期工作状态：',
+   optA:{text:'任务清晰、流程固定、结果可预期的稳定节奏',pole:'A'},
+   optB:{text:'任务多变、节奏不定、需要随时随机应变',pole:'B'}},
+  {id:'D3-S03',dim:'D3',type:'scenario',
+   text:'临时插入紧急任务打乱了你的计划，你通常会：',
+   optA:{text:'感到压力，需要停下来重新梳理整体安排',pole:'A'},
+   optB:{text:'立刻切换处理紧急任务，这对你是常态',pole:'B'}},
+  {id:'D3-S04',dim:'D3',type:'scenario',
+   text:'一天结束时，最让你有成就感的状态是：',
+   optA:{text:'今天计划好的任务全部按时完成',pole:'A'},
+   optB:{text:'处理了很多突发情况，问题都解决了',pole:'B'}},
+  {id:'D3-S05',dim:'D3',type:'scenario',
+   text:'你认为自己更擅长：',
+   optA:{text:'设计好流程，确保项目按既定路径稳步推进',pole:'A'},
+   optB:{text:'在资源不足或情况突变时临时找到创造性解法',pole:'B'}},
+  {id:'D3-S06',dim:'D3',type:'scenario',
+   text:'一个任务有很多种做法，你更倾向于：',
+   optA:{text:'找到最优的那一种方法，然后严格执行',pole:'A'},
+   optB:{text:'先用够用的方法快速推进，边走边优化',pole:'B'}},
+  {id:'D3-S07',dim:'D3',type:'scenario',
+   text:'你更愿意参与哪类项目：',
+   optA:{text:'有明确目标和时间节点，需要长期持续推进',pole:'A'},
+   optB:{text:'需要快速迭代、经常调整方向的探索性项目',pole:'B'}},
+  {id:'D3-S08',dim:'D3',type:'scenario',
+   text:'对你来说，"工作做好了"意味着：',
+   optA:{text:'按时、按质、按量完成，没有遗漏任何环节',pole:'A'},
+   optB:{text:'在变化和限制中找到最优解，结果符合预期',pole:'B'}},
+  {id:'D3-L09',dim:'D3',type:'scale',
+   text:'我通常会提前规划好未来一周甚至更长时间的工作安排',
+   poleHigh:'A'},
+  {id:'D3-L10',dim:'D3',type:'scale',
+   text:'工作计划被临时改变，对我影响不大，我能很快适应',
+   poleHigh:'B'},
+  {id:'D3-L11',dim:'D3',type:'scale',
+   text:'我更喜欢在有明确规则和流程的环境中工作',
+   poleHigh:'A'},
+  {id:'D3-L12',dim:'D3',type:'scale',
+   text:'朋友会用"随机应变"来描述我，我认为这是我的突出优势',
+   poleHigh:'B'},
+
+  // ── D4 影响方式 (Expressive E ←→ Behind-scenes B) ──
+  {id:'D4-S01',dim:'D4',type:'scenario',
+   text:'在陌生的团队讨论中，你更常做的事是：',
+   optA:{text:'主动发言，分享看法，推动讨论方向',pole:'A'},
+   optB:{text:'认真倾听，在关键时刻提出支持性补充',pole:'B'}},
+  {id:'D4-S02',dim:'D4',type:'scenario',
+   text:'你更享受哪种方式产生的影响力：',
+   optA:{text:'通过演讲、说服让他人接受你的想法',pole:'A'},
+   optB:{text:'通过专业能力和实际产出默默改变局面',pole:'B'}},
+  {id:'D4-S03',dim:'D4',type:'scenario',
+   text:'如果被提升为团队负责人，你会更愿意：',
+   optA:{text:'承担对外发言、资源争取、方向决策',pole:'A'},
+   optB:{text:'做内部协调、质量把控、支持成员成长',pole:'B'}},
+  {id:'D4-S04',dim:'D4',type:'scenario',
+   text:'当你的想法和多数人不同时，你通常会：',
+   optA:{text:'坚持阐述观点，尝试说服大家接受你的思路',pole:'A'},
+   optB:{text:'先把想法记下来，等找到合适时机再提出',pole:'B'}},
+  {id:'D4-S05',dim:'D4',type:'scenario',
+   text:'你更认同哪句话：',
+   optA:{text:'"优秀的领导者要敢于站出来，为团队指明方向"',pole:'A'},
+   optB:{text:'"最好的团队成员让整个系统运转更顺畅"',pole:'B'}},
+  {id:'D4-S06',dim:'D4',type:'scenario',
+   text:'下班后的职业社交，你更倾向于：',
+   optA:{text:'主动参加行业交流活动，拓展人脉',pole:'A'},
+   optB:{text:'和固定几个信任的人深度交流',pole:'B'}},
+  {id:'D4-S07',dim:'D4',type:'scenario',
+   text:'团队遭遇了问题，你更可能做的是：',
+   optA:{text:'主动站出来，主导解决方案，推动大家行动',pole:'A'},
+   optB:{text:'在背后帮助分析症结，支持负责人做决定',pole:'B'}},
+  {id:'D4-S08',dim:'D4',type:'scenario',
+   text:'你更享受哪种工作状态：',
+   optA:{text:'作为项目负责人，主导一个项目从0到1落地',pole:'A'},
+   optB:{text:'作为核心执行者，把某个方向做到业内最优',pole:'B'}},
+  {id:'D4-L09',dim:'D4',type:'scale',
+   text:'在小组讨论或会议中，我通常是最先开口发言的那个人',
+   poleHigh:'A'},
+  {id:'D4-L10',dim:'D4',type:'scale',
+   text:'我更享受在幕后把事情做好，不需要站在聚光灯下',
+   poleHigh:'B'},
+  {id:'D4-L11',dim:'D4',type:'scale',
+   text:'我有比较强的说服力，能让别人接受并相信我的观点',
+   poleHigh:'A'},
+  {id:'D4-L12',dim:'D4',type:'scale',
+   text:'比起表达，我更擅长倾听——人们更愿意来找我诉说和求助',
+   poleHigh:'B'},
+];
+
+// =============================================
+//  DATA: PERSONALITY TYPES
+// =============================================
+const SCALE_MAP = {5:[4,0],4:[3,0],3:[1.5,1.5],2:[0,3],1:[0,4]};
+
+const personalities = {
+  ADSE:{
+    name:'战略指挥官',emoji:'🎯',colorClass:'color-commander',
+    tagline:'你用数据制定战略，用系统推动世界',
+    jobs:[
+      {emoji:'🏢',title:'战略咨询顾问',reason:'数据+系统+说服力，四维完美匹配',match:95,
+       bg:'linear-gradient(135deg,#1e3c72,#2a5298)'},
+      {emoji:'📱',title:'产品经理（B端）',reason:'目标拆解+数据决策+跨团队主导',match:92,
+       bg:'linear-gradient(135deg,#0f3460,#533483)'},
+      {emoji:'📊',title:'项目管理/PMO',reason:'系统推进+主导协调=你的天然优势',match:88,
+       bg:'linear-gradient(135deg,#134e5e,#71b280)'},
+    ],
+    commentary:`【你是谁】
+
+如果要用一个画面来描述你，那应该是这样的：会议室里，你站在白板前，用几条干净的线条把一个复杂的问题拆解得清清楚楚。周围的人或许还没完全跟上你的节奏，而你已经开始分配任务了。这不是你故意要显得比别人快——这就是你自然的思维频率。
+
+你属于那种"生来就知道自己要去哪里"的人。成就感对你来说不是外部奖励，而是内部驱动的燃料。当一个目标出现在眼前，你的大脑会自动启动：分解、规划、推进、复盘。这个过程本身就让你感到活着的意义。
+
+【你的3个天赋优势】
+
+• 目标穿透力：别人还在讨论"应该做什么"时，你已经在思考"怎么做才能确保成功"。这种差距在大多数职场环境里让你非常突出。
+
+• 数据说服力：你习惯用数字说话，这让你的判断在会议室里格外有分量。当别人还在靠感觉拍板时，你能拿出清晰的分析，这是真正的竞争壁垒。
+
+• 系统感：你不只是"做事快"，而是"做事有结构"。每个动作都在更大的框架里，不会白费力气，也不会事后返工。
+
+【你需要注意的盲区】
+
+在你高效运转的世界里，"人"有时候会被你当成"资源"对待。当某个同事的速度跟不上你，或者决策不够果断时，你内心的不耐烦会透过眼神和语气传递出去，而对方甚至不知道为什么你"突然冷了"。长期来看，这会让你在需要调动他人时遭遇意想不到的阻力——而所有真正大的成就，都需要人跟你一起做到。
+
+【最适合你的3个方向】
+
+• 战略咨询/管理咨询：你那套"数据→分析→系统方案"的思维恰好是咨询业的核心方法论，而你的主导表达能力能让客户真正接受你的建议。
+
+• B端产品经理：需要把复杂业务问题转化为系统性解决方案，并主导多个团队协同推进，这几乎是为你量身定制的岗位。
+
+• 项目管理/PMO：成就感来自项目成功交付，用数据衡量进度，系统化推进里程碑——你在这里会感觉如鱼得水。
+
+【给你的一句话】
+
+你有驾驭复杂局面的天赋，唯一需要修炼的，是把"我要达到目标"升级为"我们要达到目标"。`
+  },
+
+  AISE:{
+    name:'创新领袖',emoji:'✨',colorClass:'color-innovator',
+    tagline:'你用创意点燃愿景，用系统把梦想落地',
+    jobs:[
+      {emoji:'🚀',title:'创业公司创始人',reason:'创意+感召力+系统落地，创业者黄金配置',match:96,
+       bg:'linear-gradient(135deg,#834d9b,#d04ed6)'},
+      {emoji:'🎨',title:'品牌战略总监',reason:'创意驱动+系统规划+对外感召品牌价值',match:90,
+       bg:'linear-gradient(135deg,#f46b45,#eea849)'},
+      {emoji:'💡',title:'新产品/新业务负责人',reason:'创新+系统推进+主导资源争取',match:87,
+       bg:'linear-gradient(135deg,#1e3c72,#2a5298)'},
+    ],
+    commentary:`【你是谁】
+
+你是那种走进一个会议室，五分钟后所有人都开始跟着你的思路走的人。不是因为你权威，而是因为你的想法自带吸引力——你能看到别人看不到的可能性，并且把它说得让人信服。你的直觉不是随机的灵感，而是对趋势和本质的敏锐感知。
+
+你天然属于那种"开创者"而非"守成者"。已有的框架对你来说是起点，不是终点。你最享受的状态是：从一张白纸开始，构想一个全新的东西，然后一步步把它变成现实。
+
+【你的3个天赋优势】
+
+• 愿景感召力：你能把模糊的想法变成清晰的图景，并且让周围的人相信这个图景值得为之努力。这在组织里极其稀缺——大多数人只会执行，你会"点燃"。
+
+• 创意落地力：很多有创意的人只会想，你还会做。你的系统执行倾向让你能把自己的想法真正推进落地，而不只是停留在PPT里。
+
+• 跨界整合能力：你的直觉思维让你不被条条框框限制，能把来自不同领域的元素组合在一起，产生意想不到的创新方案。
+
+【你需要注意的盲区】
+
+你的短板可能藏在你最自信的地方：你的直觉太强，有时候会让你跳过验证环节，在方案还不够成熟时就全力推进。数据层面的严谨度和对风险的系统评估，是你需要刻意补强的能力——不是让你变得保守，而是让你的创意有更坚实的落地基础。
+
+【最适合你的3个方向】
+
+• 创业/内部创业：你就是为这个场景生的。不确定性、白板、需要感召团队——这些对你来说不是挑战，是舞台。
+
+• 品牌/创意方向的领导岗：你能把创意语言和商业语言都说通，这是市场/品牌总监这类岗位最核心的稀缺能力。
+
+• 新业务孵化/产品创新：你的直觉+系统+表达能力，让你在从0到1阶段有极大优势，是组织里最宝贵的创新力量。
+
+【给你的一句话】
+
+世界需要你这样的人来提出新问题——但记得，最好的创新者还懂得用数据来证明自己的直觉是对的。`
+  },
+
+  RDFE:{
+    name:'社交催化剂',emoji:'⚡',colorClass:'color-catalyst',
+    tagline:'你用关系构建网络，用灵活创造价值',
+    jobs:[
+      {emoji:'🤝',title:'商务拓展 BD',reason:'关系驱动+数据支撑+灵活策略+主导谈判',match:95,
+       bg:'linear-gradient(135deg,#f46b45,#eea849)'},
+      {emoji:'📣',title:'销售总监（大客户）',reason:'关系网络+数据目标管理+灵活应对',match:91,
+       bg:'linear-gradient(135deg,#1e3c72,#2a5298)'},
+      {emoji:'🌐',title:'公关/政府关系',reason:'关系+灵活应对+主导沟通+数据分析舆情',match:87,
+       bg:'linear-gradient(135deg,#134e5e,#71b280)'},
+    ],
+    commentary:`【你是谁】
+
+你是那种进入一个陌生场合，二十分钟后就和所有人混熟的人。但你不只是"会聊天"——你能感知到每个人真正在意什么，然后在合适的时机，把合适的人和合适的资源连接在一起。你的超能力叫做"让事情发生"，而且往往发生得比别人快得多。
+
+你的世界是流动的。固定的计划对你来说更像是参考，而不是约束。你在变化和不确定中反而能发挥最好——因为你靠关系和直觉驾驭局面，而不是靠流程。
+
+【你的3个天赋优势】
+
+• 关系资本积累：你建立关系的速度是很多人的三倍，而且你建立的是真实的信任，不只是名片交换。这在任何需要资源整合的工作里都是巨大的壁垒。
+
+• 情境灵活性：你能在不同场合、不同对象面前快速调整自己的沟通方式，这让你几乎能和任何人有效协作。销售、谈判、跨部门合作——你在这些场景里如鱼得水。
+
+• 数据驱动的关系判断：你不只靠感觉维系关系，你懂得用数据分析哪些客户值得深耕，哪些合作机会真正有价值，这让你的关系网络不只是"广"而且"精"。
+
+【你需要注意的盲区】
+
+你的挑战是深度。关系太广、节奏太快，有时候会让你陷入"什么都有一点，什么都不够深"的困境。特别是在需要专业深度的岗位上，纯靠关系和灵活性会有天花板。建议你在自己最核心的1-2个业务领域里刻意投入时间，成为有深度的关系型专家，而不只是广泛的连接者。
+
+【最适合你的3个方向】
+
+• 商务拓展BD：这是你能力的最直接变现场景——关系、谈判、灵活策略、数据评估机会。每一样都是你的强项。
+
+• 大客户销售/销售管理：你的关系能力+数据目标感=高业绩的组合。你不是那种靠死缠烂打的销售，而是真正懂客户、能赢得长期信任的合作型销售。
+
+• 公关/媒体/政府关系：你在关系管理和灵活应对上的天赋，在这个领域极其珍贵——危机来临时，你能比别人更快找到正确的人说正确的话。
+
+【给你的一句话】
+
+你的人脉是你的资产，但真正让你与众不同的，是你知道什么时候该打哪张牌。`
+  },
+
+  ADSB:{
+    name:'精密架构师',emoji:'🔬',colorClass:'color-architect',
+    tagline:'你用数据建造世界，用系统守护精准',
+    jobs:[
+      {emoji:'📊',title:'数据科学家/分析师',reason:'纯数据驱动+系统方法论+专业深度影响',match:96,
+       bg:'linear-gradient(135deg,#134e5e,#71b280)'},
+      {emoji:'⚙️',title:'算法/机器学习工程师',reason:'成就感来自模型精度，系统推进，专业出位',match:93,
+       bg:'linear-gradient(135deg,#0f3460,#533483)'},
+      {emoji:'💰',title:'财务分析师/风险控制',reason:'数字敏感+系统流程+幕后支撑决策',match:89,
+       bg:'linear-gradient(135deg,#1e3c72,#2a5298)'},
+    ],
+    commentary:`【你是谁】
+
+你是那种别人都去开会的时候，你在安静地建模的人。你不需要掌声——你需要的是那个"结果准确了"的瞬间。你的世界是精密的：每一个变量都有其位置，每一个结论都有其依据，每一步推进都在更大的系统框架内。
+
+你的强大之处在于，你不只是"认真"，你是系统性地认真。你搭建的不是临时凑合的方案，而是真正禁得起考验的架构。
+
+【你的3个天赋优势】
+
+• 数据深度感知：在大多数人还在感性判断的时候，你已经在数字里看到了真实的信号。这种能力在数据爆炸但数据素养普遍不足的时代，是稀缺的竞争优势。
+
+• 系统构建能力：你搭建的流程、模型、分析框架，往往能在你离开后还继续产生价值。你的贡献是可复用、可扩展的，而不是一次性的。
+
+• 高质量输出的一致性：你不靠灵感波峰，而是靠标准化的高水准输出赢得信任。在需要高度可靠性的岗位上，你就是那块"压舱石"。
+
+【你需要注意的盲区】
+
+你可能低估了"表达"的重要性。你的分析很深，但如果没有人能理解和使用它，价值就打了折扣。你不需要变成一个演说家，但学会把复杂的洞见用简单的语言传递给非专业的人，会让你的工作价值放大好几倍。"会做"和"让别人看见你做了什么"，同样重要。
+
+【最适合你的3个方向】
+
+• 数据科学/机器学习：你天然属于这里——系统、数据、深度、精准，这四个词描述的就是你最好的状态。
+
+• 量化研究/风险模型：金融行业对你这种类型的人有极高的需求，而且认可度和薪酬都与你的专业深度强相关。
+
+• 产品/业务分析师：介于数据和业务之间的桥梁角色，你的系统感和数据能力能为产品决策提供真正的洞察支撑。
+
+【给你的一句话】
+
+你建造的精密系统是别人望尘莫及的，只需再迈出一步：让世界知道这个系统的存在。`
+  },
+
+  RIFE:{
+    name:'即兴表演者',emoji:'🎭',colorClass:'color-performer',
+    tagline:'你用创意感知世界，用温度影响他人',
+    jobs:[
+      {emoji:'📱',title:'内容运营/社媒运营',reason:'感知用户情绪+创意内容+灵活迭代+主导表达',match:95,
+       bg:'linear-gradient(135deg,#ff6b6b,#feca57)'},
+      {emoji:'📺',title:'电商直播/内容创作者',reason:'关系感知受众+即兴创意+灵活互动',match:92,
+       bg:'linear-gradient(135deg,#f46b45,#eea849)'},
+      {emoji:'🎪',title:'市场活动策划',reason:'创意活动+关系协调+灵活执行+主导推进',match:87,
+       bg:'linear-gradient(135deg,#834d9b,#d04ed6)'},
+    ],
+    commentary:`【你是谁】
+
+你是那种在任何场合都能即兴发挥，而且发挥得很好的人。你感受到空气中的情绪，感受到人们真正想要什么，然后用创意的方式回应它——而这一切发生得如此自然，以至于旁观者以为你做了很多准备，而你其实只是跟着感觉走。
+
+你的世界是流动的、感性的、充满色彩的。你不太适应那种"把一件事做到极致然后永远只做这一件事"的模式——你需要变化，需要新的刺激，需要和不同的人产生不同的化学反应。
+
+【你的3个天赋优势】
+
+• 情感共鸣能力：你能迅速感知受众或用户的情绪状态，并且用内容、话语或行动给予精准回应。这在内容创作、运营、市场等领域是最核心的差异化能力。
+
+• 即兴创意爆发力：你的想法不需要酝酿，它就这样冒出来，并且往往切中要害。这让你在需要快速反应、快速输出的工作场景里有天然优势。
+
+• 关系温度：你跟人打交道有一种天然的温暖，不让人感到有压力，却又能建立真实的连接。这是很多理性型人格努力学习但学不来的东西。
+
+【你需要注意的盲区】
+
+你最大的挑战可能是"持续性"。灵感来了你能做到很好，但如果要求你在没有灵感的时候保持稳定输出，或者面对一个重复性很强的执行阶段，你可能会感到焦虑和内耗。建议你给自己建立一些最小化的结构和节律——不是让你变得无聊，而是让你的创意能力在更持久的时间维度上发挥作用。
+
+【最适合你的3个方向】
+
+• 内容运营/社媒运营：你对用户情绪的感知+创意产出能力+灵活迭代的执行风格，恰好是这个岗位最需要的三件事。
+
+• 短视频/直播内容创作：即兴、关系感知、创意表达——这个赛道是为你这类人开辟的。
+
+• 品牌/市场活动：你能把活动做得有温度、有话题、有传播，而这正是活动策划最需要的灵魂。
+
+【给你的一句话】
+
+你的即兴是天赋，但最好的表演者，背后都有一套只有自己知道的纪律。`
+  },
+
+  RISB:{
+    name:'深度连接者',emoji:'🪞',colorClass:'color-connector',
+    tagline:'你用洞察理解人心，用陪伴悄悄改变世界',
+    jobs:[
+      {emoji:'🧭',title:'职业规划咨询师',reason:'关系+创意洞见+系统方法+幕后陪伴',match:95,
+       bg:'linear-gradient(135deg,#4e54c8,#8f94fb)'},
+      {emoji:'🏢',title:'企业文化/组织发展顾问',reason:'关系+创意设计+系统落地+幕后支撑',match:90,
+       bg:'linear-gradient(135deg,#134e5e,#71b280)'},
+      {emoji:'💻',title:'用户研究员/UX研究',reason:'关系感知用户+创意+系统研究流程',match:87,
+       bg:'linear-gradient(135deg,#0f3460,#533483)'},
+    ],
+    commentary:`【你是谁】
+
+你是那种让人谈了五分钟就愿意把心里话说出来的人。不是因为你善于追问，而是因为你真的在听——不只是听表面的词，而是听那些词背后的感受和未说出口的需求。
+
+你的存在方式是安静而深度的。你不需要站在台前，但你在台后做的事往往是整个系统真正运转的原因。你理解人，你理解复杂的系统，你把这两种能力结合在一起，能做到很多只会"管人"或只会"做事"的人做不到的事。
+
+【你的3个天赋优势】
+
+• 人心洞察力：你能看到人们行为背后的动机，感知团队里隐藏的张力和需求。这种能力在组织管理、咨询、用户研究等领域极其珍贵。
+
+• 深度关系建立：你建立的关系不是"广而薄"，而是"少而深"。你能成为别人真正信任和依赖的那个人，而真实的信任是职场里最稀缺的资产。
+
+• 创意式理解：你的直觉思维让你能从意想不到的角度理解人和系统，这让你的洞察往往超越常规分析框架，有时候一句话能直接点到核心。
+
+【你需要注意的盲区】
+
+你太善于理解他人，有时候会忽略自己的需求和边界。你可能长期处于"给予"的状态，却没有足够的时间和空间为自己充电。另外，你不太擅长主动表达自己的价值——你的贡献是真实的，但因为你不愿意"邀功"，周围的人可能低估了你的重要性。学会适时让自己的工作被看见，是你需要刻意练习的事。
+
+【最适合你的3个方向】
+
+• 职业咨询/职业规划：你对人的理解+系统的方法论+创意的洞见，能帮助别人看到自己看不到的可能性。这是你能力最完整的施展舞台。
+
+• 组织发展/企业文化：你懂人，也懂系统。这个交叉点上的工作，恰好是你能做出独特贡献的地方。
+
+• 用户研究：把对人的深度理解转化为产品决策的依据——你的直觉+研究方法论让你能做出真正深刻的用户洞察报告。
+
+【给你的一句话】
+
+你改变世界的方式不是站在台前呼号，而是在无数个安静的对话里，帮别人找到了自己。`
+  },
+};
+
+// Fallback mapping for other types
+const typeMapping = {
+  ADFE:'ADSE', ADFB:'ADSB', AISB:'ADSB', AIFE:'AISE', AIFB:'AISE',
+  RDSE:'RDFE', RDSB:'ADSB', RDFB:'RISB', RISE:'AISE', RIFB:'RISB',
+};
+
+function getPersonality(code){
+  if(personalities[code]) return {...personalities[code],code};
+  const fallback = typeMapping[code]||'ADSE';
+  return {...personalities[fallback],code,originalCode:fallback};
+}
+
+// =============================================
+//  STATE
+// =============================================
+const state = {
+  currentPage:'landing',
+  currentQ:0,
+  answers:{},
+  userStatus:'',
+  userIndustry:[],
+  result:null,
+  typingTimer:null,
+};
+
+// =============================================
+//  SCORING
+// =============================================
+function computeResult(){
+  const scores={D1:{A:0,B:0},D2:{A:0,B:0},D3:{A:0,B:0},D4:{A:0,B:0}};
+
+  questions.forEach(q=>{
+    const ans = state.answers[q.id];
+    if(ans===undefined) return;
+
+    if(q.type==='scenario'){
+      const pole = ans==='A'?q.optA.pole:q.optB.pole;
+      scores[q.dim][pole]+=2;
+    } else {
+      // scale 1-5
+      const val=ans;
+      const isAHigh=(q.poleHigh==='A');
+      const [aSc,bSc]=SCALE_MAP[val]||[1.5,1.5];
+      scores[q.dim]['A']+=isAHigh?aSc:bSc;
+      scores[q.dim]['B']+=isAHigh?bSc:aSc;
+    }
+  });
+
+  const pct={};
+  ['D1','D2','D3','D4'].forEach(d=>{
+    const tot=scores[d].A+scores[d].B;
+    pct[d]=tot>0?Math.round(scores[d].A/tot*100):50;
+  });
+
+  // Map to code
+  const maps={D1:['A','R'],D2:['D','I'],D3:['S','F'],D4:['E','B']};
+  let code='';
+  ['D1','D2','D3','D4'].forEach(d=>{
+    code+=pct[d]>=50?maps[d][0]:maps[d][1];
+  });
+
+  return {code,pct};
+}
+
+// =============================================
+//  NAVIGATION
+// =============================================
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+id);
+  if(el){el.classList.add('active');el.scrollTop=0;}
+  state.currentPage=id;
+}
+
+function selectChip(group,val,el){
+  if(group==='status'){
+    document.querySelectorAll('#status-chips .chip').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+    state.userStatus=val;
+  } else {
+    el.classList.toggle('selected');
+    const idx=state.userIndustry.indexOf(val);
+    if(idx===-1)state.userIndustry.push(val);
+    else state.userIndustry.splice(idx,1);
+  }
+}
+
+function startQuiz(){
+  state.currentQ=0;
+  state.answers={};
+  goPage('quiz');
+  renderQuestion();
+}
+
+function restartQuiz(){
+  state.answers={};
+  state.currentQ=0;
+  goPage('landing');
+}
+
+// =============================================
+//  QUIZ RENDERING
+// =============================================
+function renderQuestion(){
+  const q=questions[state.currentQ];
+  const pct=Math.round((state.currentQ/questions.length)*100);
+  document.getElementById('quiz-progress-bar').style.width=pct+'%';
+  document.getElementById('quiz-counter').textContent=`第 ${state.currentQ+1} / ${questions.length} 题`;
+  document.getElementById('quiz-dim-badge').textContent=DIM_NAMES[q.dim];
+
+  const area=document.getElementById('question-area');
+
+  if(q.type==='scenario'){
+    area.innerHTML=`
+      <p class="question-text">${q.text}</p>
+      <div class="options-scenario">
+        <div class="option-card" onclick="answerScenario('A',this)">
+          <div class="option-label">A</div>
+          <div class="option-text">${q.optA.text}</div>
+        </div>
+        <div class="option-card" onclick="answerScenario('B',this)">
+          <div class="option-label">B</div>
+          <div class="option-text">${q.optB.text}</div>
+        </div>
+      </div>`;
+  } else {
+    area.innerHTML=`
+      <div class="scale-question">
+        <p class="question-text">${q.text}</p>
+        <div class="scale-desc">
+          <span>完全不符合</span><span>完全符合</span>
+        </div>
+        <div class="scale-buttons">
+          ${[1,2,3,4,5].map(n=>`<button class="scale-btn" onclick="answerScale(${n},this)">${n}</button>`).join('')}
+        </div>
+        <div class="scale-labels">
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+        </div>
+      </div>`;
+  }
+}
+
+function answerScenario(choice,el){
+  const q=questions[state.currentQ];
+  state.answers[q.id]=choice;
+  document.querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  setTimeout(nextQuestion,350);
+}
+
+function answerScale(val,el){
+  const q=questions[state.currentQ];
+  state.answers[q.id]=val;
+  document.querySelectorAll('.scale-btn').forEach(b=>{
+    b.style.background='';b.style.color='';b.style.borderColor='';
+  });
+  el.style.background='linear-gradient(135deg,#667eea,#764ba2)';
+  el.style.color='#fff';
+  el.style.borderColor='#667eea';
+  setTimeout(nextQuestion,350);
+}
+
+function nextQuestion(){
+  state.currentQ++;
+  if(state.currentQ>=questions.length){
+    goPage('loading');
+    runLoadingSequence();
+  } else {
+    renderQuestion();
+  }
+}
+
+// =============================================
+//  LOADING SEQUENCE
+// =============================================
+function runLoadingSequence(){
+  const steps=['step1','step2','step3','step4'];
+  const emojis=['🧬','🔍','🤖','✨'];
+  let i=0;
+
+  function doStep(){
+    if(i>0){
+      const prev=document.getElementById(steps[i-1]);
+      prev.classList.add('done');
+      prev.innerHTML=`<span class="step-check">✓</span> `+prev.textContent.trim();
+    }
+    if(i<steps.length){
+      document.getElementById('loading-emoji').textContent=emojis[i];
+      i++;
+      setTimeout(doStep,700);
+    } else {
+      setTimeout(()=>{
+        const r=computeResult();
+        state.result=r;
+        showResult(r);
+      },500);
+    }
+  }
+  doStep();
+}
+
+// =============================================
+//  RESULTS RENDERING
+// =============================================
+function showDemoResult(){
+  // Pick a random demo type for variety
+  const demos=['ADSE','AISE','RDFE','ADSB','RIFE','RISB'];
+  const code=demos[Math.floor(Math.random()*demos.length)];
+  const demoPct={
+    ADSE:{D1:78,D2:72,D3:81,D4:68},
+    AISE:{D1:74,D2:31,D3:66,D4:73},
+    RDFE:{D1:27,D2:68,D3:32,D4:71},
+    ADSB:{D1:82,D2:77,D3:84,D4:29},
+    RIFE:{D1:24,D2:34,D3:31,D4:72},
+    RISB:{D1:31,D2:28,D3:64,D4:28},
+  };
+  state.result={code,pct:demoPct[code]};
+  showResult(state.result);
+}
+
+function showResult({code,pct}){
+  const p=getPersonality(code);
+  goPage('result');
+  document.getElementById('page-result').scrollTop=0;
+
+  // Hero
+  const bgMap={
+    'color-commander':'linear-gradient(135deg,#1e3c72,#2a5298)',
+    'color-architect':'linear-gradient(135deg,#134e5e,#71b280)',
+    'color-lightning':'linear-gradient(135deg,#e52d27,#b31217)',
+    'color-executor':'linear-gradient(135deg,#16a085,#27ae60)',
+    'color-innovator':'linear-gradient(135deg,#834d9b,#d04ed6)',
+    'color-researcher':'linear-gradient(135deg,#0f3460,#533483)',
+    'color-pioneer':'linear-gradient(135deg,#f7971e,#ffd200)',
+    'color-inventor':'linear-gradient(135deg,#f953c6,#b91d73)',
+    'color-coach':'linear-gradient(135deg,#1d976c,#93f9b9)',
+    'color-coordinator':'linear-gradient(135deg,#4e54c8,#8f94fb)',
+    'color-catalyst':'linear-gradient(135deg,#f46b45,#eea849)',
+    'color-guardian':'linear-gradient(135deg,#f64f59,#c471ed)',
+    'color-speaker':'linear-gradient(135deg,#f7971e,#ffd200)',
+    'color-connector':'linear-gradient(135deg,#4e54c8,#8f94fb)',
+    'color-performer':'linear-gradient(135deg,#ff6b6b,#feca57)',
+    'color-supporter':'linear-gradient(135deg,#a18cd1,#fbc2eb)',
+  };
+
+  document.getElementById('result-hero-bg').style.background=bgMap[p.colorClass]||'linear-gradient(135deg,#667eea,#764ba2)';
+  document.getElementById('result-emoji').textContent=p.emoji;
+  document.getElementById('result-name').textContent=p.name;
+  document.getElementById('result-code').textContent=code;
+  document.getElementById('result-tagline').textContent=p.tagline;
+
+  // Dimension scores
+  const dimCfg=[
+    {dim:'D1',aLabel:'成就驱动',bLabel:'关系导向',colors:['#667eea','#f472b6']},
+    {dim:'D2',aLabel:'数据思维',bLabel:'直觉创意',colors:['#06b6d4','#f59e0b']},
+    {dim:'D3',aLabel:'系统执行',bLabel:'灵活应变',colors:['#10b981','#f97316']},
+    {dim:'D4',aLabel:'主导表达',bLabel:'专业支撑',colors:['#8b5cf6','#ec4899']},
+  ];
+  const container=document.getElementById('dim-scores-container');
+  container.innerHTML='';
+  dimCfg.forEach(({dim,aLabel,bLabel,colors})=>{
+    const score=pct[dim];
+    const isA=score>=50;
+    const displayLabel=isA?aLabel:bLabel;
+    const displayScore=isA?score:(100-score);
+    const color=isA?colors[0]:colors[1];
+    container.innerHTML+=`
+      <div class="dim-row">
+        <div class="dim-header">
+          <span class="dim-name">${displayLabel}</span>
+          <span class="dim-score" style="color:${color}">${displayScore}%</span>
+        </div>
+        <div class="dim-bar-bg">
+          <div class="dim-bar" id="bar-${dim}" style="background:${color};--target-width:${displayScore}%"></div>
+        </div>
+        <div class="dim-poles">
+          <span class="dim-pole ${isA?'active':''}" style="${isA?'color:'+color:''}">${aLabel}</span>
+          <span class="dim-pole ${!isA?'active':''}" style="${!isA?'color:'+color:''}">${bLabel}</span>
+        </div>
+      </div>`;
+  });
+
+  // Animate bars
+  setTimeout(()=>{
+    dimCfg.forEach(({dim,aLabel,bLabel,colors})=>{
+      const score=pct[dim];
+      const isA=score>=50;
+      const displayScore=isA?score:(100-score);
+      const bar=document.getElementById('bar-'+dim);
+      if(bar)bar.style.width=displayScore+'%';
+    });
+  },200);
+
+  // Radar chart
+  setTimeout(()=>initRadar(pct),300);
+
+  // Jobs
+  const jobsContainer=document.getElementById('jobs-container');
+  jobsContainer.innerHTML='';
+  p.jobs.forEach(j=>{
+    jobsContainer.innerHTML+=`
+      <div class="job-card" style="background:${j.bg}">
+        <div class="job-icon">${j.emoji}</div>
+        <div class="job-info">
+          <div class="job-title">${j.title}</div>
+          <div class="job-reason">${j.reason}</div>
+        </div>
+        <div class="job-match">${j.match}%</div>
+      </div>`;
+  });
+
+  // Start AI typewriter after a short delay
+  setTimeout(()=>startTypewriter(p.commentary),800);
+}
+
+// =============================================
+//  RADAR CHART
+// =============================================
+function initRadar(pct){
+  const el=document.getElementById('radar-chart');
+  if(!el||typeof echarts==='undefined') return;
+  const chart=echarts.init(el);
+
+  // D1: A=成就,B=关系; D2: A=数据,B=创意; D3: A=系统,B=灵活; D4: A=表达,B=支撑
+  const d1=pct.D1; // higher = more achievement
+  const d2=pct.D2;
+  const d3=pct.D3;
+  const d4=pct.D4;
+
+  chart.setOption({
+    backgroundColor:'transparent',
+    radar:{
+      indicator:[
+        {name:'成就驱动',max:100},
+        {name:'数据思维',max:100},
+        {name:'系统执行',max:100},
+        {name:'主导表达',max:100},
+        {name:'关系温度',max:100},
+        {name:'创意直觉',max:100},
+      ],
+      shape:'circle',
+      center:['50%','50%'],
+      radius:'65%',
+      axisName:{color:'#6b7280',fontSize:12,fontFamily:'-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif'},
+      splitLine:{lineStyle:{color:'#e5e7eb'}},
+      axisLine:{lineStyle:{color:'#e5e7eb'}},
+      splitArea:{areaStyle:{color:['#fafafa','#f3f4f6']}},
+    },
+    series:[{
+      type:'radar',
+      data:[{
+        value:[d1, d2, d3, d4, 100-d1, 100-d2],
+        name:'职场能力图谱',
+        areaStyle:{color:'rgba(102,126,234,0.2)'},
+        lineStyle:{color:'#667eea',width:2},
+        itemStyle:{color:'#667eea'},
+        symbol:'circle',symbolSize:6,
+      }],
+    }],
+  });
+}
+
+// =============================================
+//  TYPEWRITER EFFECT
+// =============================================
+function startTypewriter(text){
+  const el=document.getElementById('ai-text-content');
+  const cursor=document.getElementById('ai-cursor');
+  const status=document.getElementById('ai-status');
+
+  if(!el) return;
+  el.textContent='';
+  cursor.style.display='inline-block';
+  status.textContent='▶ AI正在生成点评...';
+
+  if(state.typingTimer) clearInterval(state.typingTimer);
+
+  let i=0;
+  const speed=18; // ms per char
+
+  state.typingTimer=setInterval(()=>{
+    if(i<text.length){
+      el.textContent+=text[i];
+      i++;
+      // Auto-scroll ai section into view a bit
+      const aiSection=document.querySelector('.ai-section');
+      if(aiSection&&i===1){
+        setTimeout(()=>aiSection.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+      }
+    } else {
+      clearInterval(state.typingTimer);
+      cursor.style.display='none';
+      status.textContent='✅ 点评生成完成';
+    }
+  },speed);
+}
+
+// =============================================
+//  PARTICLES (Landing Page)
+// =============================================
+function initParticles(){
+  const canvas=document.getElementById('particles');
+  if(!canvas) return;
+  const colors=['#a78bfa','#93c5fd','#6ee7b7','#fca5a5','#fde68a'];
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');
+    const size=Math.random()*20+8;
+    const left=Math.random()*100;
+    const delay=Math.random()*8;
+    const dur=Math.random()*6+6;
+    p.className='particle';
+    p.style.cssText=`width:${size}px;height:${size}px;left:${left}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${dur}s;animation-delay:${delay}s;`;
+    canvas.appendChild(p);
+  }
+}
+
+// =============================================
+//  INIT
+// =============================================
+document.addEventListener('DOMContentLoaded',()=>{
+  initParticles();
+});
+</script>
+</body>
+</html>
